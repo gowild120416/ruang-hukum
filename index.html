@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Legal Consultation Form</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&family=Public+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --page:#E7E4DA;
+    --pad:#FDF8E3;
+    --rule:rgba(122,140,168,0.30);
+    --margin:#B3453E;
+    --ink:#24291F;
+    --forest:#243A2C;
+    --forest-soft:#3B5A45;
+    --brass:#9C7A2E;
+    --brass-soft:#D8BD7B;
+    --danger:#B4483A;
+    --white:#FFFFFF;
+    --radius:2px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    min-height:100vh;
+    background:var(--page);
+    color:var(--ink);
+    font-family:'Public Sans', sans-serif;
+    display:flex;
+    align-items:flex-start;
+    justify-content:center;
+    padding:44px 16px 90px;
+  }
+  .wrap{ width:100%; max-width:660px; }
+
+  .topbar{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:26px;
+  }
+  .firm{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.72rem;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--forest-soft);
+  }
+  .lang-toggle{
+    display:flex; border:1px solid var(--forest-soft); border-radius:100px; overflow:hidden;
+    font-family:'IBM Plex Mono', monospace; font-size:0.72rem;
+  }
+  .lang-toggle button{
+    border:none; background:transparent; padding:6px 13px; cursor:pointer;
+    color:var(--forest-soft); font-family:inherit; font-size:inherit;
+    transition:background .15s ease, color .15s ease;
+  }
+  .lang-toggle button.active{ background:var(--forest); color:#fff; }
+
+  h1{
+    font-family:'Source Serif 4', serif;
+    font-weight:600;
+    font-size:clamp(1.7rem, 4vw, 2.35rem);
+    margin:0 0 8px;
+    color:var(--forest);
+    letter-spacing:-0.01em;
+  }
+  .sub{
+    color:#5C6353;
+    font-size:0.97rem;
+    margin:0 0 30px;
+    max-width:50ch;
+  }
+
+  /* ===== Progress: seal badges ===== */
+  .progress{
+    display:flex;
+    margin-bottom:34px;
+  }
+  .pnode{
+    flex:1;
+    text-align:center;
+    position:relative;
+  }
+  .pnode:not(:last-child)::after{
+    content:"";
+    position:absolute;
+    top:16px; left:58%; right:-42%;
+    height:1px;
+    background:var(--rule);
+  }
+  .pnode.done:not(:last-child)::after{ background:var(--brass); }
+  .badge{
+    width:32px; height:32px;
+    border-radius:50%;
+    border:1.5px solid #C7CDBB;
+    display:flex; align-items:center; justify-content:center;
+    margin:0 auto 8px;
+    font-family:'Source Serif 4', serif;
+    font-weight:600;
+    font-size:0.85rem;
+    color:#9AA290;
+    background:var(--pad);
+    position:relative; z-index:1;
+    transition:all .2s ease;
+  }
+  .pnode.active .badge{ border-color:var(--forest); color:var(--forest); background:#fff; }
+  .pnode.done .badge{ border-color:var(--brass); background:var(--brass); color:#fff; }
+  .pname{
+    font-size:0.68rem;
+    font-family:'IBM Plex Mono', monospace;
+    color:#9AA290;
+    letter-spacing:0.02em;
+  }
+  .pnode.active .pname{ color:var(--forest); font-weight:500; }
+  .pnode.done .pname{ color:var(--brass); }
+
+  /* ===== Sheet: ruled legal pad ===== */
+  .sheet{
+    position:relative;
+    background:
+      repeating-linear-gradient(var(--pad), var(--pad) 30px, var(--rule) 31px, var(--pad) 32px);
+    border:1px solid #DDD6BC;
+    border-radius:var(--radius);
+    padding:40px 34px 30px 56px;
+    box-shadow:0 1px 0 rgba(36,41,31,0.03), 0 18px 44px -30px rgba(36,41,31,0.4);
+  }
+  .sheet::before{
+    content:"";
+    position:absolute; top:0; bottom:0; left:38px;
+    width:1px; background:var(--margin); opacity:0.55;
+  }
+  @media (max-width:520px){
+    .sheet{ padding:34px 20px 26px 20px; }
+    .sheet::before{ display:none; }
+  }
+
+  .step-tag{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.7rem;
+    color:var(--brass);
+    letter-spacing:0.08em;
+    margin-bottom:6px;
+  }
+  .step-title{
+    font-family:'Source Serif 4', serif;
+    font-weight:600;
+    font-size:1.32rem;
+    margin:0 0 24px;
+    color:var(--forest);
+  }
+
+  .field{ margin-bottom:22px; }
+  .field label{
+    display:block;
+    font-size:0.82rem;
+    font-weight:600;
+    color:var(--forest);
+    margin-bottom:7px;
+  }
+
+  input[type=text], input[type=email], input[type=tel], select, textarea{
+    width:100%;
+    font-family:'Public Sans', sans-serif;
+    font-size:0.95rem;
+    padding:11px 13px;
+    border:1px solid #CBC6AE;
+    border-radius:var(--radius);
+    background:#fff;
+    color:var(--ink);
+    transition:border-color .15s ease, box-shadow .15s ease;
+  }
+  textarea{ resize:vertical; min-height:84px; }
+  input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-visible, .chip:focus-visible, .radio-card:focus-visible{
+    outline:2px solid var(--brass);
+    outline-offset:2px;
+  }
+  input:focus, select:focus, textarea:focus{
+    border-color:var(--forest-soft);
+    box-shadow:0 0 0 3px rgba(59,90,69,0.10);
+  }
+  input::placeholder, textarea::placeholder{ color:#B3AD97; }
+
+  .radio-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  @media (max-width:480px){ .radio-grid{ grid-template-columns:1fr; } }
+  .radio-card{
+    border:1px solid #CBC6AE;
+    border-radius:var(--radius);
+    padding:12px 14px;
+    cursor:pointer;
+    font-size:0.87rem;
+    color:var(--ink);
+    background:#fff;
+    transition:border-color .15s ease, background .15s ease;
+    position:relative;
+  }
+  .radio-card input{ position:absolute; opacity:0; }
+  .radio-card.checked{ border-color:var(--forest); background:#F4F5EF; }
+
+  .conditional{
+    margin-top:14px;
+    padding-left:14px;
+    border-left:2px solid var(--brass-soft);
+    animation:slidein .25s ease;
+  }
+  @keyframes slidein{ from{opacity:0; transform:translateY(-6px);} to{opacity:1; transform:translateY(0);} }
+
+  .chip-row{ display:flex; flex-wrap:wrap; gap:8px; }
+  .chip{
+    font-size:0.83rem;
+    padding:9px 15px;
+    border:1px solid #CBC6AE;
+    border-radius:100px;
+    background:#fff;
+    cursor:pointer;
+    color:var(--ink);
+    user-select:none;
+    transition:all .15s ease;
+  }
+  .chip.active{ background:var(--forest); border-color:var(--forest); color:#fff; }
+
+  .dropzone{
+    border:1.5px dashed #C7C1A6;
+    border-radius:var(--radius);
+    padding:24px 16px;
+    text-align:center;
+    cursor:pointer;
+    transition:border-color .15s ease, background .15s ease;
+    background:#FBF9EF;
+  }
+  .dropzone.drag{ border-color:var(--brass); background:#FBF2D9; }
+  .dropzone p{ margin:0; font-size:0.84rem; color:#7C7561; }
+  .dropzone .dz-main{ color:var(--forest); font-weight:600; margin-bottom:4px; }
+  .file-list{ margin-top:10px; text-align:left; }
+  .file-item{
+    display:flex; align-items:center; justify-content:space-between;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.75rem;
+    background:#F4F5EF;
+    border:1px solid #E1DFCF;
+    border-radius:var(--radius);
+    padding:7px 10px;
+    margin-top:6px;
+  }
+  .file-item button{ background:none; border:none; color:var(--danger); cursor:pointer; font-size:0.9rem; }
+
+  .consent{
+    display:flex; gap:10px; align-items:flex-start;
+    background:#F4F5EF; border:1px solid #E1DFCF; border-radius:var(--radius);
+    padding:14px 15px; margin-top:6px;
+  }
+  .consent input{ margin-top:3px; flex-shrink:0; }
+  .consent label{ font-size:0.83rem; color:#4C5344; margin:0; font-weight:400; line-height:1.5; }
+
+  .nav-row{
+    display:flex; justify-content:space-between; align-items:center;
+    margin-top:32px; padding-top:22px; border-top:1px solid var(--rule);
+  }
+  button.btn{
+    font-family:'Public Sans', sans-serif;
+    font-size:0.88rem; font-weight:600;
+    padding:11px 22px;
+    border-radius:var(--radius);
+    cursor:pointer;
+    border:1px solid transparent;
+    transition:transform .12s ease, background .15s ease;
+  }
+  button.btn:active{ transform:translateY(1px); }
+  .btn-primary{ background:var(--forest); color:#fff; }
+  .btn-primary:hover{ background:var(--forest-soft); }
+  .btn-ghost{ background:none; color:var(--forest-soft); border-color:#CBC6AE; }
+  .btn-ghost:hover{ border-color:var(--forest-soft); }
+
+  .err{ color:var(--danger); font-size:0.76rem; margin-top:5px; display:none; }
+  .field.invalid input, .field.invalid select, .field.invalid textarea{ border-color:var(--danger); }
+  .field.invalid .err{ display:block; }
+  .consent.invalid{ border-color:var(--danger); }
+  .consent .err{ margin-top:8px; }
+
+  .summary-block{ margin-bottom:18px; }
+  .summary-block h3{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.7rem; letter-spacing:0.08em; text-transform:uppercase;
+    color:var(--brass); margin:0 0 8px;
+  }
+  .summary-row{
+    display:flex; justify-content:space-between; gap:14px;
+    font-size:0.86rem; padding:7px 0; border-bottom:1px dashed #DDD6BC;
+  }
+  .summary-row dt{ color:#7C7561; }
+  .summary-row dd{ margin:0; text-align:right; color:var(--ink); font-weight:500; max-width:60%; }
+
+  .done-state{ text-align:center; padding:20px 0 10px; }
+  .done-mark{
+    width:52px; height:52px; border-radius:50%;
+    background:#E9EEE6; color:var(--forest-soft);
+    display:flex; align-items:center; justify-content:center;
+    margin:0 auto 18px; font-size:1.4rem;
+    font-family:'Source Serif 4', serif;
+  }
+  .done-state h2{
+    font-family:'Source Serif 4', serif; font-weight:600;
+    color:var(--forest); font-size:1.45rem; margin:0 0 8px;
+  }
+  .done-state p{ color:#5C6353; font-size:0.92rem; max-width:40ch; margin:0 auto; }
+  .integration-note{
+    margin-top:24px; padding:14px 16px;
+    background:#F4F5EF; border:1px dashed #C7C1A6; border-radius:var(--radius);
+    font-family:'IBM Plex Mono', monospace; font-size:0.72rem; color:#7C7561; text-align:left;
+  }
+  .integration-note code{ background:#fff; padding:1px 5px; border-radius:2px; }
+
+  .disclaimer{
+    margin-top:18px; font-size:0.74rem; color:#8A8570; text-align:center;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    html{ scroll-behavior:auto; }
+    .conditional{ animation:none; }
+    button.btn:active{ transform:none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <div class="topbar">
+    <div class="firm" data-t="firmName">INTERSA LAW OFFICE</div>
+    <div class="lang-toggle">
+      <button type="button" data-lang="id">ID</button>
+      <button type="button" data-lang="en">EN</button>
+    </div>
+  </div>
+
+  <h1 data-t="title">Konsultasikan perkara Anda</h1>
+  <p class="sub" data-t="subtitle">Lengkapi formulir singkat berikut agar tim kami dapat menyiapkan konsultasi awal yang relevan dengan kebutuhan hukum Anda.</p>
+
+  <div class="progress" id="progress"></div>
+
+  <div class="sheet">
+    <form id="form">
+
+      <!-- STEP 1 -->
+      <section class="step" data-step="1">
+        <div class="step-tag" data-t="s1.tag">01 — DATA PEMOHON</div>
+        <h2 class="step-title" data-t="s1.title">Siapa yang akan kami hubungi?</h2>
+
+        <div class="field" data-req>
+          <label data-t="s1.namaLabel" for="nama">Nama lengkap</label>
+          <input type="text" id="nama" data-t-ph="s1.namaPh">
+          <div class="err" data-t="s1.namaErr">Nama wajib diisi.</div>
+        </div>
+        <div class="field" data-req data-type="email">
+          <label data-t="s1.emailLabel" for="email">Alamat email</label>
+          <input type="email" id="email" data-t-ph="s1.emailPh">
+          <div class="err" data-t="s1.emailErr">Masukkan email yang valid.</div>
+        </div>
+        <div class="field" data-req>
+          <label data-t="s1.teleponLabel" for="telepon">Nomor telepon / WhatsApp</label>
+          <input type="tel" id="telepon" data-t-ph="s1.teleponPh">
+          <div class="err" data-t="s1.teleponErr">Nomor telepon wajib diisi.</div>
+        </div>
+      </section>
+
+      <!-- STEP 2 -->
+      <section class="step" data-step="2" hidden>
+        <div class="step-tag" data-t="s2.tag">02 — JENIS PERKARA</div>
+        <h2 class="step-title" data-t="s2.title">Perkara apa yang Anda hadapi?</h2>
+
+        <div class="field" data-req>
+          <label data-t="s2.jenisLabel">Kategori hukum</label>
+          <div class="radio-grid" id="jenisPerkara"></div>
+          <div class="err" data-t="s2.jenisErr">Pilih salah satu kategori.</div>
+        </div>
+
+        <div id="conditionalWrap"></div>
+      </section>
+
+      <!-- STEP 3 -->
+      <section class="step" data-step="3" hidden>
+        <div class="step-tag" data-t="s3.tag">03 — KEBUTUHAN KONSULTASI</div>
+        <h2 class="step-title" data-t="s3.title">Layanan hukum apa yang dibutuhkan?</h2>
+
+        <div class="field" data-req>
+          <label data-t="s3.layananLabel">Layanan (bisa lebih dari satu)</label>
+          <div class="chip-row" id="layananChips"></div>
+          <div class="err" data-t="s3.layananErr">Pilih minimal satu layanan.</div>
+        </div>
+
+        <div class="field" data-req>
+          <label data-t="s3.urgensiLabel" for="urgensi">Tingkat urgensi</label>
+          <select id="urgensi"></select>
+          <div class="err" data-t="s3.urgensiErr">Pilih tingkat urgensi.</div>
+        </div>
+
+        <div class="field">
+          <label data-t="s3.dokumenLabel">Dokumen pendukung (opsional)</label>
+          <div class="dropzone" id="dropzone" tabindex="0">
+            <p class="dz-main" data-t="s3.dzMain">Seret dokumen ke sini</p>
+            <p data-t="s3.dzSub">atau klik untuk memilih file — PDF, DOC, max 10MB</p>
+          </div>
+          <input type="file" id="fileInput" hidden multiple>
+          <div class="file-list" id="fileList"></div>
+        </div>
+      </section>
+
+      <!-- STEP 4 -->
+      <section class="step" data-step="4" hidden>
+        <div class="step-tag" data-t="s4.tag">04 — JADWAL &amp; PERSETUJUAN</div>
+        <h2 class="step-title" data-t="s4.title">Kapan waktu terbaik untuk dihubungi?</h2>
+
+        <div class="field" data-req>
+          <label data-t="s4.metodeLabel">Metode kontak yang disukai</label>
+          <div class="radio-grid" id="metodeKontak"></div>
+          <div class="err" data-t="s4.metodeErr">Pilih metode kontak.</div>
+        </div>
+
+        <div class="field" data-req>
+          <label data-t="s4.waktuLabel" for="waktu">Waktu preferensi</label>
+          <select id="waktu"></select>
+          <div class="err" data-t="s4.waktuErr">Pilih waktu preferensi.</div>
+        </div>
+
+        <div class="field">
+          <label data-t="s4.catatanLabel" for="catatan">Ringkasan singkat perkara</label>
+          <textarea id="catatan" data-t-ph="s4.catatanPh"></textarea>
+        </div>
+
+        <div class="consent" data-req id="consentField">
+          <input type="checkbox" id="consent">
+          <label for="consent" data-t="s4.consentLabel">Saya memahami bahwa informasi ini akan dijaga kerahasiaannya sesuai kode etik advokat, dan mengizinkan tim kantor hukum menghubungi saya terkait perkara ini.</label>
+        </div>
+        <div class="err" data-t="s4.consentErr" style="margin-left:2px;">Persetujuan diperlukan untuk melanjutkan.</div>
+      </section>
+
+      <!-- STEP 5: REVIEW -->
+      <section class="step" data-step="5" hidden>
+        <div class="step-tag" data-t="s5.tag">05 — RINGKASAN</div>
+        <h2 class="step-title" data-t="s5.title">Periksa kembali sebelum dikirim</h2>
+        <div id="summary"></div>
+      </section>
+
+      <!-- DONE -->
+      <section class="step" data-step="done" hidden>
+        <div class="done-state">
+          <div class="done-mark">✓</div>
+          <h2 data-t="done.title">Terkirim</h2>
+          <p data-t="done.msg">Terima kasih. Klien email Anda akan terbuka untuk mengonfirmasi pengiriman ringkasan perkara ke kantor kami.</p>
+          <div class="integration-note" data-t="done.note">
+            Catatan implementasi: pengiriman saat ini menggunakan tautan <code>mailto:</code> ke DESTINATION_EMAIL pada CONFIG di bagian atas JavaScript. Untuk pengiriman otomatis tanpa membuka aplikasi email (mis. lewat FormSubmit atau backend sendiri), ganti fungsi handleSubmit().
+          </div>
+        </div>
+      </section>
+
+      <div class="nav-row" id="navRow">
+        <button type="button" class="btn btn-ghost" id="btnBack" data-t="nav.back">Kembali</button>
+        <button type="button" class="btn btn-primary" id="btnNext" data-t="nav.next">Lanjut</button>
+      </div>
+    </form>
+  </div>
+
+  <p class="disclaimer" data-t="disclaimer">Formulir ini bukan pengganti nasihat hukum resmi. Hubungan advokat-klien baru terbentuk setelah penunjukan resmi.</p>
+</div>
+
+<script>
+(function(){
+
+  /* ======================================================================
+     KONFIGURASI — bagian ini yang paling sering diubah pemilik formulir.
+     ====================================================================== */
+  const CONFIG = {
+    destinationEmail: "konsultasi@kantorhukumrekan.co.id", // ganti sesuai email tujuan
+    defaultLang: "id" // "id" atau "en"
+  };
+
+  /* ======================================================================
+     TEKS BILINGUAL — semua teks yang tampil di formulir ada di sini.
+     Cukup ubah nilainya (bagian setelah titik dua) untuk mengganti teks,
+     tanpa perlu menyentuh HTML atau logika di bawah.
+     ====================================================================== */
+  const TEXT = {
+    id: {
+      firmName: "Kantor Hukum &amp; Rekan",
+      title: "Konsultasikan perkara Anda",
+      subtitle: "Lengkapi formulir singkat berikut agar tim kami dapat menyiapkan konsultasi awal yang relevan dengan kebutuhan hukum Anda.",
+      progress: ["Data Diri","Jenis Perkara","Kebutuhan","Jadwal"],
+      s1: {
+        tag:"01 — DATA PEMOHON", title:"Siapa yang akan kami hubungi?",
+        namaLabel:"Nama lengkap", namaPh:"Nama Anda", namaErr:"Nama wajib diisi.",
+        emailLabel:"Alamat email", emailPh:"nama@email.com", emailErr:"Masukkan email yang valid.",
+        teleponLabel:"Nomor telepon / WhatsApp", teleponPh:"08xx xxxx xxxx", teleponErr:"Nomor telepon wajib diisi."
+      },
+      s2: {
+        tag:"02 — JENIS PERKARA", title:"Perkara apa yang Anda hadapi?",
+        jenisLabel:"Kategori hukum", jenisErr:"Pilih salah satu kategori.",
+        kategori: [
+          {v:"Perdata", l:"Perdata"},
+          {v:"Pidana", l:"Pidana"},
+          {v:"Bisnis & Korporasi", l:"Bisnis &amp; Korporasi"},
+          {v:"Keluarga", l:"Keluarga"},
+          {v:"Properti", l:"Properti &amp; Pertanahan"},
+          {v:"Ketenagakerjaan", l:"Ketenagakerjaan"},
+          {v:"Lainnya", l:"Lainnya"}
+        ],
+        conditional: {
+          "Perdata": {label:"Estimasi nilai sengketa", type:"select", options:["< Rp 100 juta","Rp 100 juta – Rp 1 miliar","Rp 1 miliar – Rp 10 miliar","> Rp 10 miliar","Belum dapat diperkirakan"]},
+          "Pidana": {label:"Status kasus saat ini", type:"select", options:["Belum ada laporan polisi","Sudah ada laporan polisi","Tahap penyidikan","Tahap persidangan","Sudah ada putusan"]},
+          "Bisnis & Korporasi": {label:"Jenis entitas usaha", type:"select", options:["Perorangan / belum berbadan hukum","CV","PT","Firma","Koperasi","Lainnya"]},
+          "Keluarga": {label:"Jenis perkara keluarga", type:"select", options:["Perceraian","Hak asuh anak","Warisan","Perjanjian pra-nikah","Lainnya"]},
+          "Properti": {label:"Jenis aset terkait", type:"select", options:["Tanah","Bangunan / rumah","Apartemen / rusun","Sengketa batas lahan","Lainnya"]},
+          "Ketenagakerjaan": {label:"Posisi Anda", type:"select", options:["Pekerja / karyawan","Pengusaha / pemberi kerja"]},
+          "Lainnya": {label:"Jelaskan singkat perkara Anda", type:"text", placeholder:"Ceritakan secara singkat..."}
+        }
+      },
+      s3: {
+        tag:"03 — KEBUTUHAN KONSULTASI", title:"Layanan hukum apa yang dibutuhkan?",
+        layananLabel:"Layanan (bisa lebih dari satu)", layananErr:"Pilih minimal satu layanan.",
+        layanan: ["Konsultasi Awal","Pendampingan Hukum","Legal Opinion","Legal Drafting","Litigasi / Persidangan","Mediasi & Negosiasi","Due Diligence","Lainnya"],
+        urgensiLabel:"Tingkat urgensi", urgensiErr:"Pilih tingkat urgensi.",
+        urgensi: ["Pilih urgensi","Segera (dalam 24 jam)","Minggu ini","Fleksibel"],
+        dokumenLabel:"Dokumen pendukung (opsional)",
+        dzMain:"Seret dokumen ke sini", dzSub:"atau klik untuk memilih file — PDF, DOC, max 10MB"
+      },
+      s4: {
+        tag:"04 — JADWAL &amp; PERSETUJUAN", title:"Kapan waktu terbaik untuk dihubungi?",
+        metodeLabel:"Metode kontak yang disukai", metodeErr:"Pilih metode kontak.",
+        metode: ["WhatsApp","Email","Telepon","Tatap muka di kantor"],
+        waktuLabel:"Waktu preferensi", waktuErr:"Pilih waktu preferensi.",
+        waktu: ["Pilih waktu","Pagi (09.00–12.00)","Siang (12.00–15.00)","Sore (15.00–18.00)","Fleksibel"],
+        catatanLabel:"Ringkasan singkat perkara", catatanPh:"Ceritakan konteks yang perlu kami ketahui sebelum sesi konsultasi...",
+        consentLabel:"Saya memahami bahwa informasi ini akan dijaga kerahasiaannya sesuai kode etik advokat, dan mengizinkan tim kantor hukum menghubungi saya terkait perkara ini.",
+        consentErr:"Persetujuan diperlukan untuk melanjutkan."
+      },
+      s5: {
+        tag:"05 — RINGKASAN", title:"Periksa kembali sebelum dikirim",
+        headers:{ data:"Data Pemohon", perkara:"Jenis Perkara", kebutuhan:"Kebutuhan Konsultasi", jadwal:"Jadwal & Persetujuan" },
+        labels:{ nama:"Nama", email:"Email", telepon:"Telepon", kategori:"Kategori", layanan:"Layanan", urgensi:"Urgensi", dokumen:"Dokumen", metode:"Metode kontak", waktu:"Waktu", catatan:"Catatan", consent:"Persetujuan kerahasiaan" },
+        yes:"Disetujui", no:"—"
+      },
+      done: {
+        title:"Terkirim",
+        msg:"Terima kasih. Aplikasi email Anda akan terbuka untuk mengonfirmasi pengiriman ringkasan perkara ke kantor kami.",
+        note:"Catatan implementasi: pengiriman saat ini menggunakan tautan <code>mailto:</code> ke alamat pada <code>CONFIG.destinationEmail</code> di bagian atas JavaScript. Untuk pengiriman otomatis tanpa membuka aplikasi email (mis. lewat FormSubmit.co atau backend sendiri), sesuaikan fungsi <code>handleSubmit()</code>."
+      },
+      nav: { back:"Kembali", next:"Lanjut", submit:"Kirim" },
+      disclaimer:"Formulir ini bukan pengganti nasihat hukum resmi. Hubungan advokat–klien baru terbentuk setelah penunjukan resmi."
+    },
+
+    en: {
+      firmName: "Law Firm &amp; Partners",
+      title: "Tell us about your case",
+      subtitle: "Complete this short form so our team can prepare a relevant initial consultation for your legal matter.",
+      progress: ["Your Details","Case Type","Requirements","Schedule"],
+      s1: {
+        tag:"01 — APPLICANT DETAILS", title:"Who should we contact?",
+        namaLabel:"Full name", namaPh:"Your name", namaErr:"Name is required.",
+        emailLabel:"Email address", emailPh:"name@email.com", emailErr:"Enter a valid email.",
+        teleponLabel:"Phone / WhatsApp number", teleponPh:"e.g. +62 8xx xxxx xxxx", teleponErr:"Phone number is required."
+      },
+      s2: {
+        tag:"02 — CASE TYPE", title:"What matter are you facing?",
+        jenisLabel:"Legal category", jenisErr:"Please select one category.",
+        kategori: [
+          {v:"Perdata", l:"Civil"},
+          {v:"Pidana", l:"Criminal"},
+          {v:"Bisnis & Korporasi", l:"Business &amp; Corporate"},
+          {v:"Keluarga", l:"Family"},
+          {v:"Properti", l:"Property &amp; Land"},
+          {v:"Ketenagakerjaan", l:"Employment"},
+          {v:"Lainnya", l:"Other"}
+        ],
+        conditional: {
+          "Perdata": {label:"Estimated dispute value", type:"select", options:["< IDR 100 million","IDR 100 million – 1 billion","IDR 1 – 10 billion","> IDR 10 billion","Not yet estimable"]},
+          "Pidana": {label:"Current case status", type:"select", options:["No police report filed","Police report filed","Under investigation","In trial","Verdict issued"]},
+          "Bisnis & Korporasi": {label:"Business entity type", type:"select", options:["Individual / unregistered","CV (Limited Partnership)","PT (Limited Company)","Firma (Partnership)","Cooperative","Other"]},
+          "Keluarga": {label:"Type of family matter", type:"select", options:["Divorce","Child custody","Inheritance","Prenuptial agreement","Other"]},
+          "Properti": {label:"Type of asset involved", type:"select", options:["Land","House / building","Apartment","Land boundary dispute","Other"]},
+          "Ketenagakerjaan": {label:"Your position", type:"select", options:["Employee / worker","Employer / business owner"]},
+          "Lainnya": {label:"Briefly describe your matter", type:"text", placeholder:"Tell us briefly..."}
+        }
+      },
+      s3: {
+        tag:"03 — CONSULTATION NEEDS", title:"What legal service do you need?",
+        layananLabel:"Service (select any that apply)", layananErr:"Select at least one service.",
+        layanan: ["Initial Consultation","Legal Representation","Legal Opinion","Legal Drafting","Litigation","Mediation & Negotiation","Due Diligence","Other"],
+        urgensiLabel:"Urgency level", urgensiErr:"Select an urgency level.",
+        urgensi: ["Select urgency","Urgent (within 24 hours)","This week","Flexible"],
+        dokumenLabel:"Supporting documents (optional)",
+        dzMain:"Drag documents here", dzSub:"or click to browse — PDF, DOC, max 10MB"
+      },
+      s4: {
+        tag:"04 — SCHEDULE &amp; CONSENT", title:"What's the best time to reach you?",
+        metodeLabel:"Preferred contact method", metodeErr:"Select a contact method.",
+        metode: ["WhatsApp","Email","Phone call","In-person at office"],
+        waktuLabel:"Preferred time", waktuErr:"Select a preferred time.",
+        waktu: ["Select a time","Morning (09:00–12:00)","Afternoon (12:00–15:00)","Evening (15:00–18:00)","Flexible"],
+        catatanLabel:"Brief case summary", catatanPh:"Share any context we should know before the consultation...",
+        consentLabel:"I understand this information will be kept confidential in accordance with attorney ethics, and I authorize the firm's team to contact me regarding this matter.",
+        consentErr:"Consent is required to proceed."
+      },
+      s5: {
+        tag:"05 — SUMMARY", title:"Review before sending",
+        headers:{ data:"Applicant Details", perkara:"Case Type", kebutuhan:"Consultation Needs", jadwal:"Schedule & Consent" },
+        labels:{ nama:"Name", email:"Email", telepon:"Phone", kategori:"Category", layanan:"Service", urgensi:"Urgency", dokumen:"Documents", metode:"Contact method", waktu:"Time", catatan:"Notes", consent:"Confidentiality consent" },
+        yes:"Agreed", no:"—"
+      },
+      done: {
+        title:"Sent",
+        msg:"Thank you. Your email client will open to confirm sending the case summary to our office.",
+        note:"Implementation note: submission currently uses a <code>mailto:</code> link to the address in <code>CONFIG.destinationEmail</code> at the top of the JavaScript. For silent automatic delivery without opening an email app (e.g. via FormSubmit.co or your own backend), adapt the <code>handleSubmit()</code> function."
+      },
+      nav: { back:"Back", next:"Next", submit:"Submit" },
+      disclaimer:"This form does not constitute formal legal advice. An attorney–client relationship is only formed upon formal engagement."
+    }
+  };
+
+  let lang = CONFIG.defaultLang;
+
+  /* ====================== State ====================== */
+  const steps = ['1','2','3','4','5','done'];
+  let current = 0;
+  let files = [];
+
+  const stepEls = {};
+  document.querySelectorAll('.step').forEach(s=> stepEls[s.dataset.step] = s);
+
+  /* ====================== i18n helper ====================== */
+  function get(obj, path){
+    return path.split('.').reduce((o,k)=> (o||{})[k], obj);
+  }
+
+  function applyLanguage(){
+    const T = TEXT[lang];
+    document.documentElement.lang = lang;
+    document.querySelectorAll('[data-t]').forEach(el=>{
+      const val = get(T, el.dataset.t);
+      if(val !== undefined) el.innerHTML = val;
+    });
+    document.querySelectorAll('[data-t-ph]').forEach(el=>{
+      const val = get(T, el.dataset.tPh);
+      if(val !== undefined) el.setAttribute('placeholder', val);
+    });
+    document.querySelectorAll('.lang-toggle button').forEach(b=>{
+      b.classList.toggle('active', b.dataset.lang === lang);
+    });
+
+    buildProgress(T);
+    buildRadioGroup('jenisPerkara', T.s2.kategori, 'jenis');
+    buildChips('layananChips', T.s3.layanan);
+    buildSelect('urgensi', T.s3.urgensi);
+    buildRadioGroup('metodeKontak', T.s4.metode.map(m=>({v:m,l:m})), 'metode');
+    buildSelect('waktu', T.s4.waktu);
+
+    // re-render conditional field for currently selected jenis, if any
+    const checkedJenis = document.querySelector('input[name=jenis]:checked');
+    renderConditional(checkedJenis ? checkedJenis.value : null);
+
+    document.getElementById('btnNext').textContent = (steps[current] === '5') ? T.nav.submit : T.nav.next;
+
+    if(steps[current] === '5') buildSummary();
+  }
+
+  function buildProgress(T){
+    const el = document.getElementById('progress');
+    const prevActive = current;
+    el.innerHTML = '';
+    T.progress.forEach((name, i)=>{
+      const n = i+1;
+      const node = document.createElement('div');
+      node.className = 'pnode';
+      node.dataset.n = n;
+      node.innerHTML = `<div class="badge">${['I','II','III','IV'][i]}</div><div class="pname">${name}</div>`;
+      el.appendChild(node);
+    });
+    updateProgress();
+  }
+
+  function updateProgress(){
+    const stepNum = parseInt(steps[current]) || 5;
+    document.querySelectorAll('.pnode').forEach(n=>{
+      const num = parseInt(n.dataset.n);
+      n.classList.remove('active','done');
+      if(num < stepNum) n.classList.add('done');
+      else if(num === stepNum) n.classList.add('active');
+    });
+  }
+
+  /* ====================== Builders (re-run on language change) ====================== */
+  function buildRadioGroup(containerId, items, name){
+    const el = document.getElementById(containerId);
+    const prevChecked = document.querySelector(`input[name=${name}]:checked`)?.value;
+    el.innerHTML = items.map(it => `
+      <label class="radio-card">
+        <input type="radio" name="${name}" value="${it.v}">${it.l}
+      </label>`).join('');
+    el.querySelectorAll('input').forEach(r=>{
+      if(r.value === prevChecked) { r.checked = true; r.closest('.radio-card').classList.add('checked'); }
+      r.addEventListener('change', ()=>{
+        el.querySelectorAll('.radio-card').forEach(c=>c.classList.remove('checked'));
+        r.closest('.radio-card').classList.add('checked');
+        if(name === 'jenis') renderConditional(r.value);
+      });
+    });
+  }
+
+  function buildChips(containerId, items){
+    const el = document.getElementById(containerId);
+    const prevActive = Array.from(el.querySelectorAll('.chip.active')).map(c=>c.dataset.i);
+    el.innerHTML = items.map((label,i) => `<div class="chip" data-i="${i}" data-v="${label}">${label}</div>`).join('');
+    el.querySelectorAll('.chip').forEach(c=>{
+      if(prevActive.includes(c.dataset.i)) c.classList.add('active');
+    });
+  }
+  document.addEventListener('click', (e)=>{
+    const c = e.target.closest('.chip');
+    if(c) c.classList.toggle('active');
+  });
+
+  function buildSelect(id, options){
+    const el = document.getElementById(id);
+    const prevVal = el.value;
+    el.innerHTML = options.map((o,i)=> `<option value="${i===0?'':o}">${o}</option>`).join('');
+    if([...el.options].some(o=>o.value===prevVal)) el.value = prevVal;
+  }
+
+  const conditionalWrap = document.getElementById('conditionalWrap');
+  function renderConditional(jenisValue){
+    const T = TEXT[lang];
+    if(!jenisValue || !T.s2.conditional[jenisValue]){ conditionalWrap.innerHTML=''; return; }
+    const cfg = T.s2.conditional[jenisValue];
+    const prevVal = document.getElementById('condField')?.querySelector('input,select')?.value || '';
+    let inner = `<label for="condInput">${cfg.label}</label>`;
+    if(cfg.type === 'select'){
+      inner += `<select id="condInput"><option value="">—</option>${cfg.options.map(o=>`<option ${o===prevVal?'selected':''}>${o}</option>`).join('')}</select>`;
+    } else {
+      inner += `<input type="text" id="condInput" placeholder="${cfg.placeholder||''}" value="${prevVal}">`;
+    }
+    conditionalWrap.innerHTML = `<div class="field conditional" data-req id="condField">${inner}<div class="err">${lang==='id'?'Field ini wajib diisi.':'This field is required.'}</div></div>`;
+  }
+
+  /* ====================== Language toggle ====================== */
+  document.querySelectorAll('.lang-toggle button').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      lang = b.dataset.lang;
+      applyLanguage();
+    });
+  });
+
+  /* ====================== Navigation ====================== */
+  function showStep(idx){
+    steps.forEach(s => stepEls[s].hidden = true);
+    const key = steps[idx];
+    stepEls[key].hidden = false;
+    updateProgress();
+    document.getElementById('navRow').style.display = (key === 'done') ? 'none' : 'flex';
+    document.getElementById('btnBack').style.visibility = (idx === 0) ? 'hidden' : 'visible';
+    document.getElementById('btnNext').textContent = (key === '5') ? TEXT[lang].nav.submit : TEXT[lang].nav.next;
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+
+  function validateStep(stepKey){
+    let valid = true;
+    const section = stepEls[stepKey];
+
+    section.querySelectorAll('.field[data-req]').forEach(f=>{
+      let ok = true;
+      const input = f.querySelector('input:not([type=radio]):not([type=checkbox]), select, textarea');
+      if(input){
+        ok = input.value.trim().length > 0;
+        if(ok && f.dataset.type === 'email'){
+          ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.value.trim());
+        }
+      } else {
+        const radios = f.querySelectorAll('input[type=radio]');
+        if(radios.length) ok = Array.from(radios).some(r=>r.checked);
+      }
+      f.classList.toggle('invalid', !ok);
+      if(!ok) valid = false;
+    });
+
+    if(stepKey === '3'){
+      const anyChip = document.querySelector('#layananChips .chip.active');
+      const chipField = document.querySelector('#layananChips').closest('.field');
+      chipField.classList.toggle('invalid', !anyChip);
+      if(!anyChip) valid = false;
+    }
+
+    if(stepKey === '4'){
+      const consent = document.getElementById('consent');
+      const consentField = document.getElementById('consentField');
+      const consentErr = consentField.nextElementSibling;
+      const ok = consent.checked;
+      consentField.classList.toggle('invalid', !ok);
+      consentErr.style.display = ok ? 'none' : 'block';
+      if(!ok) valid = false;
+    }
+    return valid;
+  }
+
+  function buildSummary(){
+    const T = TEXT[lang];
+    const L = T.s5.labels;
+    const val = id => (document.getElementById(id)?.value || '—');
+    const jenisChecked = document.querySelector('input[name=jenis]:checked');
+    const jenisLabel = jenisChecked ? T.s2.kategori.find(k=>k.v===jenisChecked.value)?.l.replace(/&amp;/g,'&') : '—';
+    const metode = document.querySelector('input[name=metode]:checked')?.value || '—';
+    const layananArr = Array.from(document.querySelectorAll('#layananChips .chip.active')).map(c=>c.dataset.v);
+    const condInput = document.getElementById('condInput');
+    const consentChecked = document.getElementById('consent').checked;
+
+    let condRow = '';
+    if(condInput){
+      const lbl = document.querySelector('#condField label').textContent;
+      condRow = `<div class="summary-row"><dt>${lbl}</dt><dd>${condInput.value || '—'}</dd></div>`;
+    }
+
+    document.getElementById('summary').innerHTML = `
+      <div class="summary-block">
+        <h3>${T.s5.headers.data}</h3>
+        <div class="summary-row"><dt>${L.nama}</dt><dd>${val('nama')}</dd></div>
+        <div class="summary-row"><dt>${L.email}</dt><dd>${val('email')}</dd></div>
+        <div class="summary-row"><dt>${L.telepon}</dt><dd>${val('telepon')}</dd></div>
+      </div>
+      <div class="summary-block">
+        <h3>${T.s5.headers.perkara}</h3>
+        <div class="summary-row"><dt>${L.kategori}</dt><dd>${jenisLabel}</dd></div>
+        ${condRow}
+      </div>
+      <div class="summary-block">
+        <h3>${T.s5.headers.kebutuhan}</h3>
+        <div class="summary-row"><dt>${L.layanan}</dt><dd>${layananArr.join(', ') || '—'}</dd></div>
+        <div class="summary-row"><dt>${L.urgensi}</dt><dd>${val('urgensi') || '—'}</dd></div>
+        <div class="summary-row"><dt>${L.dokumen}</dt><dd>${files.length ? files.length : '—'}</dd></div>
+      </div>
+      <div class="summary-block">
+        <h3>${T.s5.headers.jadwal}</h3>
+        <div class="summary-row"><dt>${L.metode}</dt><dd>${metode}</dd></div>
+        <div class="summary-row"><dt>${L.waktu}</dt><dd>${val('waktu') || '—'}</dd></div>
+        <div class="summary-row"><dt>${L.catatan}</dt><dd>${val('catatan')}</dd></div>
+        <div class="summary-row"><dt>${L.consent}</dt><dd>${consentChecked ? T.s5.yes : T.s5.no}</dd></div>
+      </div>
+    `;
+  }
+
+  /* ====================== Submit → email ======================
+     Default: buka email client via mailto: dengan ringkasan sebagai body.
+     Untuk pengiriman otomatis tanpa membuka aplikasi email, ganti isi
+     fungsi ini misalnya dengan fetch() ke layanan seperti FormSubmit.co,
+     Formspree, atau endpoint backend milik kantor hukum sendiri. */
+  function handleSubmit(){
+    const T = TEXT[lang];
+    const L = T.s5.labels;
+    const val = id => (document.getElementById(id)?.value || '-');
+    const jenisChecked = document.querySelector('input[name=jenis]:checked');
+    const jenisLabel = jenisChecked ? jenisChecked.value : '-';
+    const metode = document.querySelector('input[name=metode]:checked')?.value || '-';
+    const layananArr = Array.from(document.querySelectorAll('#layananChips .chip.active')).map(c=>c.dataset.v);
+    const condInput = document.getElementById('condInput');
+
+    const bodyLines = [
+      `${L.nama}: ${val('nama')}`,
+      `${L.email}: ${val('email')}`,
+      `${L.telepon}: ${val('telepon')}`,
+      ``,
+      `${L.kategori}: ${jenisLabel}`,
+      condInput ? `${document.querySelector('#condField label').textContent}: ${condInput.value}` : '',
+      ``,
+      `${L.layanan}: ${layananArr.join(', ')}`,
+      `${L.urgensi}: ${val('urgensi')}`,
+      ``,
+      `${L.metode}: ${metode}`,
+      `${L.waktu}: ${val('waktu')}`,
+      `${L.catatan}: ${val('catatan')}`
+    ].filter(Boolean).join('\n');
+
+    const subject = encodeURIComponent(`${lang==='id'?'Permintaan Konsultasi Hukum':'Legal Consultation Request'} — ${val('nama')}`);
+    const body = encodeURIComponent(bodyLines);
+    window.location.href = `mailto:${CONFIG.destinationEmail}?subject=${subject}&body=${body}`;
+
+    showStep(steps.indexOf('done'));
+  }
+
+  document.getElementById('btnNext').addEventListener('click', ()=>{
+    const key = steps[current];
+    if(key !== '5' && !validateStep(key)){ return; }
+    if(key === '5'){ handleSubmit(); return; }
+    if(key === '4'){ buildSummary(); }
+    current++;
+    showStep(current);
+  });
+  document.getElementById('btnBack').addEventListener('click', ()=>{
+    if(current === 0) return;
+    current--;
+    showStep(current);
+  });
+
+  /* ====================== Dropzone ====================== */
+  const dropzone = document.getElementById('dropzone');
+  const fileInput = document.getElementById('fileInput');
+  const fileList = document.getElementById('fileList');
+  dropzone.addEventListener('click', ()=> fileInput.click());
+  dropzone.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' ') fileInput.click(); });
+  ['dragenter','dragover'].forEach(ev=> dropzone.addEventListener(ev, (e)=>{ e.preventDefault(); dropzone.classList.add('drag'); }));
+  ['dragleave','drop'].forEach(ev=> dropzone.addEventListener(ev, (e)=>{ e.preventDefault(); dropzone.classList.remove('drag'); }));
+  dropzone.addEventListener('drop', (e)=>{ handleFiles(e.dataTransfer.files); });
+  fileInput.addEventListener('change', (e)=> handleFiles(e.target.files));
+  function handleFiles(list){
+    Array.from(list).forEach(f => files.push(f));
+    renderFiles();
+  }
+  function renderFiles(){
+    fileList.innerHTML = files.map((f,i)=>`
+      <div class="file-item">
+        <span>${f.name} · ${(f.size/1024).toFixed(0)} KB</span>
+        <button type="button" data-i="${i}" aria-label="remove">✕</button>
+      </div>`).join('');
+    fileList.querySelectorAll('button').forEach(b=>{
+      b.addEventListener('click', ()=>{ files.splice(parseInt(b.dataset.i),1); renderFiles(); });
+    });
+  }
+
+  /* ====================== Init ====================== */
+  applyLanguage();
+  showStep(0);
+})();
+</script>
+
+</body>
+</html>
